@@ -6,9 +6,11 @@ import com.WebChat.Entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
-@Component
+@Repository
 public class MessageDaoHibernate implements MessageDao  {
 
     private SessionFactory sessionFactory;

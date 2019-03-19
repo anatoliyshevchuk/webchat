@@ -1,6 +1,7 @@
 package com.WebChat.Entity;
 
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import javax.persistence.Entity;

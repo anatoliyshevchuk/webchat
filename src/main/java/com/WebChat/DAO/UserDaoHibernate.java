@@ -5,12 +5,13 @@ import com.WebChat.Entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.util.List;
 
-@Component
+@Repository
 public class UserDaoHibernate implements UserDao {
 
     private SessionFactory sessionFactory;
