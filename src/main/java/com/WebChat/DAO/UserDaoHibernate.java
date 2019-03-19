@@ -6,13 +6,18 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Component;
 
-import javax.management.Query;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.util.List;
 
 @Component
 public class UserDaoHibernate implements UserDao {
 
-    private SessionFactory sessionFactory = DaoConfig.getHibernateSessionFactory();
+    private SessionFactory sessionFactory;
+
+    private UserDaoHibernate() {
+        sessionFactory = DaoConfigUtil.getHibernateSessionFactory();
+    }
 
     @Override
     public List<Message> getMessagesByUserId(Long id) {
@@ -28,9 +33,15 @@ public class UserDaoHibernate implements UserDao {
     public User getUserByName(String loginname) {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        User usr = new User();
-        //Query query = session.createQuery("select u from User u where u.name=:name");
-
+        Query query = session.createQuery("from User u where u.name=:loginname",User.class);
+        query.setParameter("loginname",loginname);
+        User usr=null;
+        try {
+            usr = (User)query.getSingleResult();
+        }catch(NoResultException e)
+        {
+            System.err.println(e);
+        }
         return usr;
     }
 

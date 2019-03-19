@@ -14,7 +14,7 @@ public class MessageDaoHibernate implements MessageDao  {
     private SessionFactory sessionFactory;
 
     public MessageDaoHibernate() {
-        sessionFactory = DaoConfig.getHibernateSessionFactory();
+        sessionFactory = DaoConfigUtil.getHibernateSessionFactory();
     }
 
     @Override

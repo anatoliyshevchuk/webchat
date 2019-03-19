@@ -19,7 +19,12 @@ public class LoginController {
         User user = userService.getUserByUserName(login);
         ModelAndView model = new ModelAndView();
         //TODO: Check user by Spring Security
-        if(user.getPassword().equals(password))
+        if(user==null)
+        {
+            model.setViewName("errorLogin");
+            return model;
+        }
+        if(userService.checkUserNamePassword(user,login,password))
         {
             model.setViewName("main");
             model.addObject("user",user);

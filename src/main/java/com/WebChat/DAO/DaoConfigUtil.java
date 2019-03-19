@@ -8,7 +8,7 @@ import org.hibernate.cfg.Configuration;
 import javax.transaction.NotSupportedException;
 
 
-class DaoConfig {
+class DaoConfigUtil {
 
     private static SessionFactory factory;
 

@@ -19,7 +19,7 @@ public class UserService {
     @Autowired
     void setMessageDAO(@Qualifier("messageDaoHibernate") MessageDao messageDAO)
     {
-        this.messageDAO=messageDAO;
+        this.messageDAO = messageDAO;
     }
 
     @Autowired
@@ -35,4 +35,9 @@ public class UserService {
         return userDao.getUserByName(name);
     }
 
+
+    public boolean checkUserNamePassword(User usr,String name,String password)
+    {
+        return usr.getName().equals(name) && usr.getPassword().equals(password);
+    }
 }
