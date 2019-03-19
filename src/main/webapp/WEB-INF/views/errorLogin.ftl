@@ -5,6 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-        error
+        <h1>Wrong name and password</h1>
+        <a href="/">Back to login screen</a>
 </body>
 </html>

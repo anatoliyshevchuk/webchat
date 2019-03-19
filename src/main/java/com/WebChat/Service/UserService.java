@@ -17,8 +17,7 @@ public class UserService {
     private UserDao userDao;
 
     @Autowired
-    void setMessageDAO(@Qualifier("messageDaoHibernate") MessageDao messageDAO)
-    {
+    void setMessageDAO(@Qualifier("messageDaoHibernate") MessageDao messageDAO) {
         this.messageDAO = messageDAO;
     }
 
@@ -34,7 +33,6 @@ public class UserService {
     public User getUserByUserName(String name){
         return userDao.getUserByName(name);
     }
-
 
     public boolean checkUserNamePassword(User usr,String name,String password)
     {
