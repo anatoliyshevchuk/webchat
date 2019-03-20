@@ -5,6 +5,7 @@ import com.WebChat.Entity.Message;
 import com.WebChat.Entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
@@ -38,6 +39,11 @@ public class MessageDaoHibernate implements MessageDao  {
 
     @Override
     public void saveMessage(Message msg) {
-
+        Transaction trx=null;
+        Session session = sessionFactory.openSession();
+        trx=session.beginTransaction();
+        session.save(msg);
+        trx.commit();
+        session.close();
     }
 }

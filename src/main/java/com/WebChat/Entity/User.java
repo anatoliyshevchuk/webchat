@@ -30,7 +30,7 @@ public class User {
     @Column
     private String email;
 
-    @OneToMany(mappedBy = "fromUser")
+    @OneToMany(mappedBy = "messageToUser")
     private List<Message> messageList;
 
     public User()
@@ -38,6 +38,9 @@ public class User {
 
     @Override
     public String toString() {
-        return name;
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }

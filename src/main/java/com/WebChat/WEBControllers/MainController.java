@@ -1,24 +1,56 @@
 package com.WebChat.WEBControllers;
 
+import com.WebChat.Entity.User;
+import com.WebChat.Service.MessageService;
+import com.WebChat.Service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @Controller
+@SessionAttributes("user")
 public class MainController {
 
+    private UserService userService;
+    private MessageService messageService;
+
+    @Autowired
+    public MainController(UserService userService, MessageService messageService) {
+        this.userService = userService;
+        this.messageService = messageService;
+    }
+
     @GetMapping("/")
-    private String MainPage()
-    {
+    private String MainPage() {
              return "loginPage";
     }
 
     @RequestMapping(value="/sendMessage", method= RequestMethod.POST)
-    private String sendMessage(@RequestParam("toUser")String userName,@RequestParam("message")String message)
+    private ModelAndView sendMessage(@RequestParam("toUser")String toUserName, @RequestParam("message")String message, @SessionAttribute("user") User fromUser)
     {
-        
-        return "main";
+        ModelAndView modelAndView = new ModelAndView("main");
+        User toUser =  userService.getUserByUserName(toUserName);
+        if(toUser==null)
+        {
+            modelAndView.addObject("message",message);
+            modelAndView.addObject("error","No such user found");
+            modelAndView.setViewName("main");
+            return modelAndView;
+        }
+        messageService.sendMessage(message,fromUser,toUser);
+
+        return modelAndView;
+    }
+
+    @RequestMapping(value = "/logoff")
+    private String logout(HttpServletRequest request)
+    {
+        HttpSession session = request.getSession();
+        session.invalidate();
+        return "redirect:/";
     }
 }

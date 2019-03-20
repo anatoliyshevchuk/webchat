@@ -7,18 +7,25 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
+@SessionAttributes("user")
 public class LoginController {
 
     private UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     private ModelAndView login(@RequestParam("loginName")String login, @RequestParam("loginPassword")String password){
         User user = userService.getUserByUserName(login);
         ModelAndView model = new ModelAndView();
-        //TODO: Check user by Spring Security
+        //TODO: Spring Security
         if(user==null)
         {
             model.setViewName("errorLogin");
@@ -34,11 +41,6 @@ public class LoginController {
             model.setViewName("errorLogin");
         }
         return model;
-    }
-
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
     }
 
 }

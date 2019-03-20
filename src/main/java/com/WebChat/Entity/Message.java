@@ -27,15 +27,20 @@ public class Message {
     private Date date;
 
     @ManyToOne
-    @JoinColumn(name = "from_user_id")
-    private User fromUser;
+    @JoinColumn(name = "to_user")
+    private User messageToUser;
+
+    @Column(name="from_user_id")
+    private Long messageFrom;
 
     public Message()
     {}
 
-    @Override
-    public String toString() {
-        return message + date +
-                ", from User=" + fromUser;
+    public Message(String message, Date date, User messageFromUser, User messageToUser) {
+        this.message = message;
+        this.date = date;
+        this.messageToUser = messageToUser;
+        this.messageFrom = messageFromUser.getId();
     }
+
 }
