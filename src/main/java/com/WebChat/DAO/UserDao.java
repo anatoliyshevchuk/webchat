@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface UserDao {
 
-    List<Message> getMessagesByUserId(Long id);
     User getUserById(Long id);
     User getUserByName(String name);
-    User getUserFullMessage(List<Message> listMessage);
     void saveUser();
 }

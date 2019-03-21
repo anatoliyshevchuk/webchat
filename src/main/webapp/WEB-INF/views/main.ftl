@@ -1,18 +1,20 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Main Page</title>
 </head>
 <body>
-    Hello, ${user.name}!
+    Hello, ${user.name}! <a href="/logoff">logoff</a>
 
-    <form action="/sendMessage" method="post">
-        <b>To:</b><input type="text" name="toUser" required>
-        <textarea rows="10" cols="30" name="message"/>
-        <input type="submit" value="Send">
+
+    <p>Start conversation with</p>
+    <form action="/startConversation">
+    <input type="text" name="conversationPartner" required>
+    <input type="submit">
+    <p>${error!''}</p>
     </form>
-
 
 </body>
 </html>

@@ -23,7 +23,7 @@ public class MessageService {
         this.userService = userService;
     }
 
-    public List<Message> getMessagesByUserId(Long id) {
+    public List<Message> getMessagesByUserId(int id) {
         return messageDAO.getMessagesByUserId(id);
     }
 

@@ -3,10 +3,9 @@ package com.WebChat.DAO;
 import com.WebChat.Entity.Message;
 
 import com.WebChat.Entity.User;
+import com.WebChat.utils.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,17 +13,13 @@ import java.util.List;
 @Repository
 public class MessageDaoHibernate implements MessageDao  {
 
-    private SessionFactory sessionFactory;
-
-    public MessageDaoHibernate() {
-        sessionFactory = DaoConfigUtil.getHibernateSessionFactory();
-    }
-
     @Override
-    public List<Message> getMessagesByUserId(Long id) {
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        return session.get(User.class, id).getMessageList();
+    public List<Message> getMessagesByUserId(int id) {
+        Session session = HibernateUtil.getSession();
+        Transaction trx = session.beginTransaction();
+        List<Message> messages = session.get(User.class, id).getMessageList();
+        trx.commit();
+        return messages;
     }
 
     @Override
@@ -39,11 +34,11 @@ public class MessageDaoHibernate implements MessageDao  {
 
     @Override
     public void saveMessage(Message msg) {
-        Transaction trx=null;
-        Session session = sessionFactory.openSession();
-        trx=session.beginTransaction();
+        Session session = HibernateUtil.getSession();
+        Transaction trx=session.beginTransaction();
         session.save(msg);
         trx.commit();
         session.close();
     }
+
 }

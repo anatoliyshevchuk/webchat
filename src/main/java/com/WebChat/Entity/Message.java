@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name="Message")
-public class Message {
+public class Message implements Comparable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class Message {
     private User messageToUser;
 
     @Column(name="from_user_id")
-    private Long messageFrom;
+    private int messageFrom;
 
     public Message()
     {}
@@ -43,4 +43,12 @@ public class Message {
         this.messageFrom = messageFromUser.getId();
     }
 
+    private User getUser(){
+        return this.messageToUser;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return 0;
+    }
 }

@@ -1,4 +1,4 @@
-package com.WebChat.DAO;
+package com.WebChat.utils;
 
 import com.WebChat.Entity.Message;
 import com.WebChat.Entity.User;

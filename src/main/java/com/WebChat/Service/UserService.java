@@ -23,6 +23,7 @@ public class UserService {
     }
 
     public boolean checkUserNamePassword(User usr,String name,String password) {
+        //TODO: Spring Security
         return usr.getName().equals(name) & usr.getPassword().equals(password);
     }
 }

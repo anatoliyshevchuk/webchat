@@ -1,29 +1,15 @@
 package com.WebChat.DAO;
 
-import com.WebChat.Entity.Message;
 import com.WebChat.Entity.User;
+import com.WebChat.utils.HibernateUtil;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
-import java.util.List;
 
 @Repository
 public class UserDaoHibernate implements UserDao {
-
-    private SessionFactory sessionFactory;
-
-    private UserDaoHibernate() {
-        sessionFactory = DaoConfigUtil.getHibernateSessionFactory();
-    }
-
-    @Override
-    public List<Message> getMessagesByUserId(Long id) {
-        return null;
-    }
 
     @Override
     public User getUserById(Long id) {
@@ -32,7 +18,7 @@ public class UserDaoHibernate implements UserDao {
 
     @Override
     public User getUserByName(String loginname) {
-        Session session = sessionFactory.openSession();
+        Session session = HibernateUtil.getSession();
         session.beginTransaction();
         Query query = session.createQuery("from User u where u.name=:loginname",User.class);
         query.setParameter("loginname",loginname);
@@ -43,16 +29,11 @@ public class UserDaoHibernate implements UserDao {
         {
             System.err.println(e);
         }
+        session.getTransaction().commit();
         return usr;
     }
 
     @Override
-    public User getUserFullMessage(List<Message> listMessage) {
-        return null;
-    }
-
-    @Override
     public void saveUser() {
-
     }
 }
