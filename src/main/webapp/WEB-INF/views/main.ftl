@@ -8,7 +8,6 @@
 <body>
     Hello, ${user.name}! <a href="/logoff">logoff</a>
 
-
     <p>Start conversation with</p>
     <form action="/startConversation">
     <input type="text" name="conversationPartner" required>

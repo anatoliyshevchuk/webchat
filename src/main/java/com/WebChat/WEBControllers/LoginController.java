@@ -31,8 +31,10 @@ public class LoginController {
     private ModelAndView login(@RequestParam("loginName")String login, @RequestParam("loginPassword")String password){
         User user = userService.getUserByUserName(login);
         ModelAndView model = new ModelAndView();
-        //
+
+
         // TODO: Spring Security
+
         if(user==null)
         {
             model.setViewName("errorLogin");
@@ -40,7 +42,7 @@ public class LoginController {
         }
         if(userService.checkUserNamePassword(user,login,password))
         {
-            model.setViewName("main");
+            model.setViewName("redirect:/menu");
             model.addObject("user",user);
         }
         else

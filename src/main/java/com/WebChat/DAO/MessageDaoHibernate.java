@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.Query;
 import java.util.List;
 
 @Repository
@@ -15,10 +16,32 @@ public class MessageDaoHibernate implements MessageDao  {
 
     @Override
     public List<Message> getMessagesByUserId(int id) {
-        Session session = HibernateUtil.getSession();
-        Transaction trx = session.beginTransaction();
+        Session session = HibernateUtil.getOrOpenSession();
+        session.beginTransaction();
         List<Message> messages = session.get(User.class, id).getMessageList();
-        trx.commit();
+        session.getTransaction().commit();
+        return messages;
+    }
+
+    @Override
+    public List<Message> getConversation(int myId, int partnerId) {
+
+        Session session = HibernateUtil.getOrOpenSession();
+        session.beginTransaction();
+        //Select messages sended from current user to partner
+        Query query = session.createQuery("from Message m where m.messageToUser.id=:myId and m.messageFrom=:partnerId",Message.class);
+        query.setParameter("myId",myId);
+        query.setParameter("partnerId",partnerId);
+
+        List<Message> messages = query.getResultList();
+        //And select messages sended from partner to current user
+        query=session.createQuery("from Message m where m.messageToUser.id=:partnerId and m.messageFrom=:myId",Message.class);
+        query.setParameter("myId",myId);
+        query.setParameter("partnerId",partnerId);
+
+        messages.addAll(query.getResultList());
+
+        session.getTransaction().commit();
         return messages;
     }
 
@@ -34,7 +57,7 @@ public class MessageDaoHibernate implements MessageDao  {
 
     @Override
     public void saveMessage(Message msg) {
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getOrOpenSession();
         Transaction trx=session.beginTransaction();
         session.save(msg);
         trx.commit();

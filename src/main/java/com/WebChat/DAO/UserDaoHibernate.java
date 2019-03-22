@@ -4,6 +4,7 @@ import com.WebChat.Entity.User;
 import com.WebChat.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -18,7 +19,7 @@ public class UserDaoHibernate implements UserDao {
 
     @Override
     public User getUserByName(String loginname) {
-        Session session = HibernateUtil.getSession();
+        Session session = HibernateUtil.getOrOpenSession();
         session.beginTransaction();
         Query query = session.createQuery("from User u where u.name=:loginname",User.class);
         query.setParameter("loginname",loginname);

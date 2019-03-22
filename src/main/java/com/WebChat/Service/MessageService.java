@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,13 +28,20 @@ public class MessageService {
         return messageDAO.getMessagesByUserId(id);
     }
 
-    public boolean sendMessage(String msg, User fromUser, User toUserName) {
+    public List<Message> getConversation(int myId, int PartnerId) {
+        return messageDAO.getConversation(myId,PartnerId);
+    }
+
+    public void sendMessage(String msg, User fromUser, User toUserName) {
 
         //TODO: Date Format bean?
         Message message = new Message(msg, new Date(),fromUser, toUserName);
         System.out.println(message);
         messageDAO.saveMessage(message);
+    }
 
-        return false;
+    public List<Message> sortMessageByDate(List<Message> list){
+        Collections.sort(list);
+        return list;
     }
 }

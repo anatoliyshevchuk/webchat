@@ -2,22 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Conversation</title>
+    <title>Conversation with ${Partner.name}</title>
 </head>
 <body>
 
+Hello, ${user.name}!  <a href="/logoff">logoff</a>
+
+<p><b><a href="/menu"><-Back to Menu</a></b></p>
+
         <#list messagelist as message>
             <#if message.user.id == user.id>
-                <b>I said: ${message.message!''}</b>
+                <p>${message.date}   ${Partner.name} said: ${message.message!''}</p>
             <#else>
-                <p>He said: ${message.message!''}</p>
+                <p>${message.date}   I said: ${message.message!''}</p>
             </#if>
         </#list>
 
         <form action="/sendMessage" method="post">
-            <b>To:</b><input type="text" name="toUser" required>
-            <b></b>
-            <textarea rows="10" cols="25" name="message">${message!''}</textarea>
+            <textarea rows="15" cols="20" name="message">${message!''}</textarea>
             <input type="submit" value="Send">
         </form>
 

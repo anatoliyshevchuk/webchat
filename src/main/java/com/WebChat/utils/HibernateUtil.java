@@ -9,7 +9,8 @@ public class HibernateUtil {
 
     private static final SessionFactory sessionFactory = DaoConfigUtil.getHibernateSessionFactory();
 
-    public static Session getSession()
+    //TODO: Change that shit, it not working *No CurrentSessionContext*
+    public static Session getOrOpenSession()
     {
         Session session=null;
         try{
