@@ -5,12 +5,9 @@ import com.WebChat.Entity.User;
 
 import java.util.List;
 
-
 public interface MessageDao {
 
-     List<Message> getMessagesByUserId(int id);
-     List<Message> getConversation(int myId, int theirId);
      Message getMessageById(Long id);
-     Message getMessageByUser(User usr);
+     Message deleteMessage(Message msg);
      void saveMessage(Message msg);
 }

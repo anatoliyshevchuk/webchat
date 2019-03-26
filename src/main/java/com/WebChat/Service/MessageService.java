@@ -16,26 +16,16 @@ import java.util.List;
 public class MessageService {
 
     private MessageDao messageDAO;
-    private UserService userService;
 
     @Autowired
-    public MessageService(@Qualifier("messageDaoHibernate") MessageDao messageDAO, UserService userService) {
+    public MessageService(MessageDao messageDAO) {
         this.messageDAO = messageDAO;
-        this.userService = userService;
-    }
-
-    public List<Message> getMessagesByUserId(int id) {
-        return messageDAO.getMessagesByUserId(id);
-    }
-
-    public List<Message> getConversation(int myId, int PartnerId) {
-        return messageDAO.getConversation(myId,PartnerId);
     }
 
     public void sendMessage(String msg, User fromUser, User toUserName) {
 
         //TODO: Date Format bean?
-        Message message = new Message(msg, new Date(),fromUser, toUserName);
+        Message message = new Message(msg, new Date(), fromUser, toUserName);
         System.out.println(message);
         messageDAO.saveMessage(message);
     }

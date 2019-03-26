@@ -2,9 +2,7 @@ package com.WebChat.utils;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public class HibernateUtil {
 
     private static final SessionFactory sessionFactory = DaoConfigUtil.getHibernateSessionFactory();

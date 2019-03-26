@@ -26,11 +26,10 @@ public class Message implements Comparable<Message> {
     @Column
     private Date date;
 
-    @ManyToOne
-    @JoinColumn(name = "to_user")
-    private User messageToUser;
+    @Column(name = "to_user")
+    private int messageToUser;
 
-    @Column(name="from_user_id")
+    @Column(name="from_user")
     private int messageFrom;
 
     public Message()
@@ -39,17 +38,10 @@ public class Message implements Comparable<Message> {
     public Message(String message, Date date, User messageFromUser, User messageToUser) {
         this.message = message;
         this.date = date;
-        this.messageToUser = messageToUser;
+        this.messageToUser = messageToUser.getId();
         this.messageFrom = messageFromUser.getId();
     }
 
-    public User getUser(){
-        return this.messageToUser;
-    }
-
-    public int getMessageFrom(){
-        return this.messageFrom;
-    }
 
     @Override
     public int compareTo(Message o) {

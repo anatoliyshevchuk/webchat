@@ -1,5 +1,6 @@
 package com.WebChat.utils;
 
+import com.WebChat.Entity.Conversation;
 import com.WebChat.Entity.Message;
 import com.WebChat.Entity.User;
 import org.hibernate.SessionFactory;
@@ -22,6 +23,7 @@ class DaoConfigUtil {
         factory= new Configuration().configure("hibernate.cfg.xml")
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(Message.class)
+                .addAnnotatedClass(Conversation.class)
                 .buildSessionFactory();
         return factory;
     }

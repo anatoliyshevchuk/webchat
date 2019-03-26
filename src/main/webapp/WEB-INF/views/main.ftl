@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
@@ -14,6 +13,13 @@
     <input type="submit">
     <p>${error!''}</p>
     </form>
+
+    <p>Opened conversation:</p>
+    <#list conversationList as conversation>
+        <#if conversation??>
+            <a href="/showConversation">Conversation with ${conversation.partnerUser.name}</a>
+        </#if>
+    </#list>
 
 </body>
 </html>

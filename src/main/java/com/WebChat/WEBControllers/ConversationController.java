@@ -2,6 +2,7 @@ package com.WebChat.WEBControllers;
 
 import com.WebChat.Entity.Message;
 import com.WebChat.Entity.User;
+import com.WebChat.Service.ConversationService;
 import com.WebChat.Service.MessageService;
 import com.WebChat.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -22,16 +22,18 @@ public class ConversationController {
     //TODO:Thread safe variables or Scope==session will be enough or maybe use AtomicRef? dunno yet
     private final UserService userService;
     private final MessageService messageService;
+    private final ConversationService conversationService;
 
     @Autowired
-    public ConversationController(UserService userService, MessageService messageService) {
+    public ConversationController(UserService userService, MessageService messageService, ConversationService conversationService) {
         this.userService = userService;
         this.messageService = messageService;
+        this.conversationService = conversationService;
     }
 
 
     @RequestMapping("/startConversation")
-    private ModelAndView startConversation(@RequestParam ("conversationPartner") String partnerUser,Model model, @SessionAttribute("user") User thisUser)
+    private ModelAndView startConversation(@RequestParam ("conversationPartner") String partnerUser, Model model, @SessionAttribute("user") User thisUser)
     {
         User conversationPartner = userService.getUserByUserName(partnerUser);
         ModelAndView modelAndView = new ModelAndView("main");
@@ -63,9 +65,8 @@ public class ConversationController {
     @RequestMapping(value = "/showConversation",method = RequestMethod.GET)
     private ModelAndView conversation(@SessionAttribute("user") User thisUser, @SessionAttribute("Partner") User conversationPartner, ModelAndView modelAndView)
     {
-
-        //TODO:TreeSet?
-        List<Message> list = messageService.getConversation(thisUser.getId(),conversationPartner.getId());
+        //TODO:TreeSet with Data compare?
+        List<Message> list = conversationService.getConversation(thisUser.getId(), conversationPartner.getId());
         messageService.sortMessageByDate(list);
         modelAndView.addObject("messagelist",list);
         modelAndView.setViewName("conversation");

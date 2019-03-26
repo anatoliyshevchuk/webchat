@@ -32,7 +32,6 @@ public class LoginController {
         User user = userService.getUserByUserName(login);
         ModelAndView model = new ModelAndView();
 
-
         // TODO: Spring Security
 
         if(user==null)

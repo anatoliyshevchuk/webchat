@@ -14,7 +14,7 @@ public class UserService {
     private UserDao userDao;
 
     @Autowired
-    private void setUserDao(@Qualifier("userDaoHibernate") UserDao userDao) {
+    private void setUserDao(UserDao userDao) {
         this.userDao = userDao;
     }
 
