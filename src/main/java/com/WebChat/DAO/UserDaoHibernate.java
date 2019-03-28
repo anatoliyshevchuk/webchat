@@ -20,14 +20,13 @@ public class UserDaoHibernate implements UserDao {
     @Override
     public User getUserByName(String loginname) {
         Session session = HibernateUtil.getOrOpenSession();
+        User usr = null;
+        try {
         session.beginTransaction();
         Query query = session.createQuery("from User u where u.name=:loginname",User.class);
         query.setParameter("loginname",loginname);
-        User usr=null;
-        try {
-            usr = (User)query.getSingleResult();
-        }catch(NoResultException e)
-        {
+        usr = (User)query.getSingleResult();
+        }catch(NoResultException e) {
             System.err.println(e);
         }
         session.getTransaction().commit();

@@ -23,7 +23,6 @@ public class MessageService {
     }
 
     public void sendMessage(String msg, User fromUser, User toUserName) {
-
         //TODO: Date Format bean?
         Message message = new Message(msg, new Date(), fromUser, toUserName);
         System.out.println(message);

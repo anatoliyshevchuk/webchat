@@ -1,6 +1,5 @@
 package com.WebChat.WEBControllers;
 
-import com.WebChat.DAO.ConversationDao;
 import com.WebChat.Entity.User;
 import com.WebChat.Service.ConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+import java.util.Map;
+
+
 @Controller
-@SessionAttributes("user")
+@SessionAttributes(names = {"user","Partners"})
 @Scope("session")
 public class MainController {
 
@@ -29,7 +32,10 @@ public class MainController {
     @RequestMapping("/menu")
     private ModelAndView menu(ModelAndView modelAndView, @SessionAttribute("user") User user)
     {
-        modelAndView.addObject("conversationList",conversationService.getConversationListByUser(user));
+        Map<String,User> partnersMap = conversationService.getPartnersMapByUser(user);
+
+        //add to Session for less requests to db
+        modelAndView.addObject("Partners",partnersMap);
         modelAndView.setViewName("main");
         return modelAndView;
     }

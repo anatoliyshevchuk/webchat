@@ -15,9 +15,9 @@
     </form>
 
     <p>Opened conversation:</p>
-    <#list conversationList as conversation>
-        <#if conversation??>
-            <a href="/showConversation">Conversation with ${conversation.partnerUser.name}</a>
+    <#list Partners?keys as partnerName>
+        <#if partnerName??>
+            <p><a href="/showConversation/${partnerName}">Conversation with ${partnerName}</a><a href="/deleteConversation/${partnerName}">[X]</a></p>
         </#if>
     </#list>
 

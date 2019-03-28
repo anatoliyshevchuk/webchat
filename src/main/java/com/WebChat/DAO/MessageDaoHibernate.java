@@ -27,10 +27,15 @@ public class MessageDaoHibernate implements MessageDao  {
     @Override
     public void saveMessage(Message msg) {
         Session session = HibernateUtil.getOrOpenSession();
-        Transaction trx=session.beginTransaction();
-        session.save(msg);
-        trx.commit();
-        session.close();
+        Transaction trx = null;
+        try{
+            trx = session.beginTransaction();
+            session.save(msg);
+            trx.commit();
+        }catch(Exception e){
+            System.err.println(e);
+            trx.rollback();
+        }
     }
 
 }

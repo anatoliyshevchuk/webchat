@@ -5,14 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 @Setter
 @Data
 @Entity
 @Table(name="conversation")
-public class Conversation {
+public class Conversation  {
 
     @Id
     @Column(name = "id")
@@ -32,5 +34,10 @@ public class Conversation {
 
     public Conversation()
     {}
+
+    public Conversation(User currentUser, User partnerUser) {
+        this.currentUser = currentUser;
+        this.partnerUser = partnerUser;
+    }
 
 }
