@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
-@SessionAttributes(names={"user","Partners"})
+@SessionAttributes(names={"user","Conversations"})
 @Scope("session")
 public class ConversationController {
 
@@ -32,11 +31,11 @@ public class ConversationController {
         this.conversationService = conversationService;
     }
 
-
     @RequestMapping("/startConversation")
-    private ModelAndView startConversation(@RequestParam ("conversationPartner") String name, ModelAndView modelAndView, @SessionAttribute("user") User thisUser, @SessionAttribute("Partners") Map partnersMap) {
+    private ModelAndView startConversation(@RequestParam ("conversationPartner") String name, ModelAndView modelAndView, @SessionAttribute("user") User thisUser, @SessionAttribute("Conversations") List<Conversation> partnersList) {
 
-        User conversationPartner = getPartnerFromSessionOrDb(name,partnersMap);
+        User conversationPartner = userService.getUserByUserName(name);
+
         modelAndView.setViewName("main");
         if(conversationPartner==null) {
             modelAndView.addObject("error","No such user found");
@@ -46,13 +45,10 @@ public class ConversationController {
             modelAndView.addObject("error","Can't start conversation with yourself");
             return modelAndView;
         }
-        //Create new Conversation and save to db
-        Conversation conversation = new Conversation(thisUser,conversationPartner);
-        conversationService.save(conversation);
+        //Create new Conversation and save to db and to Session
+        partnersList.add(conversationService.saveAsConversation(thisUser,conversationPartner));
 
-        //Add to Session for make less request to db
-        partnersMap.put(conversationPartner.getName(),conversationPartner);
-        modelAndView.addObject("Partners",partnersMap);
+        modelAndView.addObject("Conversations",partnersList);
 
         modelAndView.setViewName("redirect:/showConversation/"+conversationPartner.getName());
         return modelAndView;
@@ -60,8 +56,9 @@ public class ConversationController {
 
 
     @RequestMapping(value="/sendMessage", method= RequestMethod.POST)
-    private String sendMessage(@RequestParam("message")String message, @SessionAttribute("user") User thisUser,@RequestParam("sendto") String name, @SessionAttribute("Partners") Map partnersMap) {
-        User conversationPartner = getPartnerFromSessionOrDb(name,partnersMap);
+    private String sendMessage(@RequestParam("message")String message, @SessionAttribute("user") User thisUser,@RequestParam("sendto") String name, @SessionAttribute("Conversations") List<Conversation> partnersList) {
+        //TODO:Refactor to conversations
+        User conversationPartner = seekConversationInSession(name,partnersList).getPartnerUser();
 
         messageService.sendMessage(message,thisUser,conversationPartner);
         return "redirect:/showConversation/"+conversationPartner.getName();
@@ -69,10 +66,19 @@ public class ConversationController {
 
 
     @RequestMapping(value = "/showConversation/{name}",method = RequestMethod.GET)
-    private ModelAndView conversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Partners") Map partnersMap) {
-        User conversationPartner = getPartnerFromSessionOrDb(name,partnersMap);
+    private ModelAndView conversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> partnersList) {
 
+        Conversation conversation = seekConversationInSession(name,partnersList);
+        User conversationPartner=null;
+
+        if(conversation==null)
+        {
+            conversationPartner = userService.getUserByUserName(name);
+            conversationService.saveAsConversation(thisUser, conversationPartner);
+        }
         List<Message> messageList = conversationService.getListMessage(thisUser.getId(), conversationPartner.getId());
+
+        //TODO:change sort to set with compare by date?
         messageService.sortMessageByDate(messageList);
 
         modelAndView.addObject("messagelist",messageList);
@@ -82,23 +88,24 @@ public class ConversationController {
     }
 
     @RequestMapping(value = "/deleteConversation/{name}",method = RequestMethod.GET)
-    private ModelAndView deleteConversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Partners") Map<String,User> partnersMap)
+    private ModelAndView deleteConversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> partnersList)
     {
-        Conversation conv = new Conversation(thisUser,partnersMap.get(name));
-        conversationService.deleteConversation(thisUser,partnersMap.get(name));
-        partnersMap.remove(name);
-        modelAndView.addObject("Partners",partnersMap);
+        Conversation convToDelete=seekConversationInSession(name,partnersList);
+        conversationService.deleteConversation(convToDelete.getCurrentUser(),convToDelete.getPartnerUser());
+        partnersList.remove(convToDelete);
+        modelAndView.addObject("Conversations",partnersList);
         modelAndView.setViewName("redirect:/menu");
         return modelAndView;
     }
 
-    private User getPartnerFromSessionOrDb(String name, Map<String,User> partnersMap) {
-        User conversationPartner;
-        conversationPartner = partnersMap.get(name);
-        if(conversationPartner==null) {
-            conversationPartner = userService.getUserByUserName(name);
+    private Conversation seekConversationInSession(String name, List<Conversation> partnersList) {
+        Conversation foundConv=null;
+        for (Conversation conv : partnersList)
+        {
+            if(conv.getPartnerUser().getName().equals(name))
+                foundConv = conv;
         }
-        return conversationPartner;
+        return foundConv;
     }
 
 }

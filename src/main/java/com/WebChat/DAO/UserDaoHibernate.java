@@ -21,6 +21,7 @@ public class UserDaoHibernate implements UserDao {
     public User getUserByName(String loginname) {
         Session session = HibernateUtil.getOrOpenSession();
         User usr = null;
+
         try {
         session.beginTransaction();
         Query query = session.createQuery("from User u where u.name=:loginname",User.class);

@@ -12,14 +12,12 @@ public class HibernateUtil {
         Session session=null;
         try{
             session = sessionFactory.getCurrentSession();
-            System.out.println("GET CURRENT");
         }
         catch (Exception e) {
             System.err.println(e);
         }
         if(session!=null)
             return session;
-        System.out.println("GET NEW");
         return sessionFactory.openSession();
     }
 }

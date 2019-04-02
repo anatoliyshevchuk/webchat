@@ -14,10 +14,12 @@
     <p>${error!''}</p>
     </form>
 
-    <p>Opened conversation:</p>
-    <#list Partners?keys as partnerName>
-        <#if partnerName??>
-            <p><a href="/showConversation/${partnerName}">Conversation with ${partnerName}</a><a href="/deleteConversation/${partnerName}">[X]</a></p>
+    <p>Opened conversations:</p>
+    <#list Conversations as Conversation>
+        <#if Conversation.currentUser.id == user.id>
+            <p><a href="/showConversation/${Conversation.partnerUser.name}">Conversation with ${Conversation.partnerUser.name}</a><a href="/deleteConversation/${Conversation.partnerUser.name}">[X]</a></p>
+        <#else>
+            <p><a href="/showConversation/${Conversation.currentUser.name}">NEW Conversation with ${Conversation.currentUser.name}</a></p>
         </#if>
     </#list>
 

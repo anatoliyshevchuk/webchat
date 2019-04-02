@@ -40,14 +40,14 @@ public class ConversationDaoHibernate implements ConversationDao {
     }
 
     @Override
-    public List<Conversation> getSuperficialConversationsList(User currentUser) {
-        //Conversations without Lists of messages. Only 2  users
+    public List<Conversation> getConversationsList(User currentUser) {
+        // My saved Conversations or conversations opened with me
         Session session = HibernateUtil.getOrOpenSession();
         List<Conversation> conversationList=null;
 
         try{
             session.beginTransaction();
-            Query query = session.createQuery("from Conversation c where c.currentUser=:currentUser",Conversation.class);
+            Query query = session.createQuery("from Conversation c where c.currentUser=:currentUser OR c.partnerUser=:currentUser",Conversation.class);
             query.setParameter("currentUser", currentUser);
             conversationList = query.getResultList();
             session.getTransaction().commit();
@@ -101,4 +101,25 @@ public class ConversationDaoHibernate implements ConversationDao {
         }
         return conv;
     }
+
+    @Override
+    public int checkNewMessages(Conversation conversation) {
+        Session session = HibernateUtil.getOrOpenSession();
+        int count=0;
+        try{
+            session.beginTransaction();
+            Query query = session.createQuery("from Message m where m.messageToUser=:currentUser and m.messageFrom=:partnerUser and m.isNew=true ",Message.class);
+
+            query.setParameter("currentUser", conversation.getCurrentUser().getId());
+            query.setParameter("partnerUser", conversation.getPartnerUser().getId());
+            count=query.getResultList().size();
+            session.getTransaction().commit();
+        }catch(Exception e){
+            System.err.println(e);
+            session.getTransaction().rollback();
+        }
+        return count;
+    }
+
+
 }

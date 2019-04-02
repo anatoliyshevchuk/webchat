@@ -8,8 +8,9 @@ import java.util.List;
 
 public interface ConversationDao {
     List<Message> getListMessage(int currentUser, int partnerId);
-    List<Conversation> getSuperficialConversationsList(User currentUser);
+    List<Conversation> getConversationsList(User currentUser);
     void save(Conversation conversation);
     void delete(Conversation conversation);
     Conversation getConversation(User usr1,User usr2);
+    int checkNewMessages(Conversation conversation);
 }

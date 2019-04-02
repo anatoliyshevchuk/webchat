@@ -7,9 +7,7 @@ import com.WebChat.Entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ConversationService {
@@ -21,21 +19,40 @@ public class ConversationService {
         this.conversationDao = conversationDao;
     }
 
-    public Map<String,User> getPartnersMapByUser(User user) {
-        List<Conversation> list = conversationDao.getSuperficialConversationsList(user);
-        Map<String,User> partnerMap = new HashMap<>();
-        for (Conversation conv:list) {
-            partnerMap.put(conv.getPartnerUser().getName(),conv.getPartnerUser());
+    public List<Conversation> getConversationListByUser(User user) {
+        List<Conversation> list = conversationDao.getConversationsList(user);
+
+        //TODO: Check new messages where I partner User
+        //Delete Conversation duplicate (where Conversation open from me and to me). Leave only conversation opened from My side
+        List<Conversation> toRemove = new ArrayList<>();
+        for (Conversation conv : list)
+        {
+            if(conv.getCurrentUser().getId().equals(user.getId()))
+            {
+                for(Conversation conv2 : list)
+                {
+                    if(conv2.getPartnerUser().getId().equals(conv.getCurrentUser().getId()) && conv2.getCurrentUser().getId().equals(conv.getPartnerUser().getId()))
+                    {
+                        toRemove.add(conv2);
+                    }
+                }
+            }
         }
-        return partnerMap;
+        list.removeAll(toRemove);
+        return list;
     }
 
     public List<Message> getListMessage(int myId, int PartnerId) {
         return conversationDao.getListMessage(myId, PartnerId);
     }
 
-    public void save(Conversation conversation) {
-        conversationDao.save(conversation);
+    public Conversation saveAsConversation(User currentUser,User partnerUser) {
+        Conversation conv = getConversation(currentUser,partnerUser);
+        if(conv==null) {
+            conv = new Conversation(currentUser, partnerUser, new Date());
+            conversationDao.save(conv);
+        }
+        return conv;
     }
 
     public void deleteConversation(User currentUser,User partnerUser) {
@@ -43,7 +60,7 @@ public class ConversationService {
         conversationDao.delete(conv);
     }
 
-    private Conversation getConversation(User usr1,User usr2) {
+    private Conversation getConversation(User usr1, User usr2) {
         return conversationDao.getConversation(usr1, usr2);
     }
 

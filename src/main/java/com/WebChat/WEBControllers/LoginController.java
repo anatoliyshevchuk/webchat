@@ -33,19 +33,15 @@ public class LoginController {
         ModelAndView model = new ModelAndView();
 
         // TODO: Spring Security
-
-        if(user==null)
-        {
+        if(user==null) {
             model.setViewName("errorLogin");
             return model;
         }
-        if(userService.checkUserNamePassword(user,login,password))
-        {
+        if(userService.checkUserNamePassword(user,login,password)) {
             model.setViewName("redirect:/menu");
             model.addObject("user",user);
         }
-        else
-        {
+        else {
             model.setViewName("errorLogin");
         }
         return model;
