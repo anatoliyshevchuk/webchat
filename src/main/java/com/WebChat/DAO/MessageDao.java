@@ -9,5 +9,5 @@ public interface MessageDao {
 
      Message getMessageById(Long id);
      Message deleteMessage(Message msg);
-     void saveMessage(Message msg);
+     boolean saveMessage(Message msg);
 }

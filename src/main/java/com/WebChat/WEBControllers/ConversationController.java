@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -32,7 +33,7 @@ public class ConversationController {
     }
 
     @RequestMapping("/startConversation")
-    private ModelAndView startConversation(@RequestParam ("conversationPartner") String name, ModelAndView modelAndView, @SessionAttribute("user") User thisUser, @SessionAttribute("Conversations") List<Conversation> partnersList) {
+    private ModelAndView startConversation(@RequestParam ("conversationPartner") String name, ModelAndView modelAndView, @SessionAttribute("user") User thisUser, @SessionAttribute("Conversations") List<Conversation> conversationList) {
 
         User conversationPartner = userService.getUserByUserName(name);
 
@@ -46,39 +47,38 @@ public class ConversationController {
             return modelAndView;
         }
         //Create new Conversation and save to db and to Session
-        partnersList.add(conversationService.saveAsConversation(thisUser,conversationPartner));
+        conversationList.add(conversationService.saveOrUpdateConversation(thisUser,conversationPartner));
 
-        modelAndView.addObject("Conversations",partnersList);
-
+        modelAndView.addObject("Conversations",conversationList);
         modelAndView.setViewName("redirect:/showConversation/"+conversationPartner.getName());
         return modelAndView;
     }
 
-
     @RequestMapping(value="/sendMessage", method= RequestMethod.POST)
-    private String sendMessage(@RequestParam("message")String message, @SessionAttribute("user") User thisUser,@RequestParam("sendto") String name, @SessionAttribute("Conversations") List<Conversation> partnersList) {
+    private String sendMessage(@RequestParam("message")String message, @SessionAttribute("user") User thisUser,@RequestParam("sendto") String name, @SessionAttribute("Conversations") List<Conversation> conversationList) {
         //TODO:Refactor to conversations
-        User conversationPartner = seekConversationInSession(name,partnersList).getPartnerUser();
-
+        User conversationPartner = seekConversationInSession(name,conversationList).getPartnerUser();
         messageService.sendMessage(message,thisUser,conversationPartner);
         return "redirect:/showConversation/"+conversationPartner.getName();
     }
 
 
     @RequestMapping(value = "/showConversation/{name}",method = RequestMethod.GET)
-    private ModelAndView conversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> partnersList) {
-
-        Conversation conversation = seekConversationInSession(name,partnersList);
-        User conversationPartner=null;
-
+    private ModelAndView conversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> conversationList) {
+        Conversation conversation = seekConversationInSession(name,conversationList);
+        User conversationPartner;
         if(conversation==null)
         {
             conversationPartner = userService.getUserByUserName(name);
-            conversationService.saveAsConversation(thisUser, conversationPartner);
+            conversationService.saveOrUpdateConversation(thisUser, conversationPartner);
+        }else
+        {
+            conversationService.updateConversationDate(conversation, new Date());
+            conversationPartner=conversation.getPartnerUser();
         }
         List<Message> messageList = conversationService.getListMessage(thisUser.getId(), conversationPartner.getId());
 
-        //TODO:change sort to set with compare by date?
+        //TODO:change sort to Set with compare by dates?
         messageService.sortMessageByDate(messageList);
 
         modelAndView.addObject("messagelist",messageList);
@@ -87,25 +87,25 @@ public class ConversationController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "/deleteConversation/{name}",method = RequestMethod.GET)
-    private ModelAndView deleteConversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> partnersList)
+
+    @RequestMapping(value = "/updateConversation/{name}",method = RequestMethod.GET)
+    private ModelAndView updateConversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> conversationList)
     {
-        Conversation convToDelete=seekConversationInSession(name,partnersList);
-        conversationService.deleteConversation(convToDelete.getCurrentUser(),convToDelete.getPartnerUser());
-        partnersList.remove(convToDelete);
-        modelAndView.addObject("Conversations",partnersList);
+        Conversation convToDelete=seekConversationInSession(name,conversationList);
+        conversationService.updateConversation(convToDelete);
+        conversationList.remove(convToDelete);
+        modelAndView.addObject("Conversations",conversationList);
         modelAndView.setViewName("redirect:/menu");
         return modelAndView;
     }
 
-    private Conversation seekConversationInSession(String name, List<Conversation> partnersList) {
+    private Conversation seekConversationInSession(String name, List<Conversation> conversationList) {
         Conversation foundConv=null;
-        for (Conversation conv : partnersList)
+        for (Conversation conv : conversationList)
         {
             if(conv.getPartnerUser().getName().equals(name))
                 foundConv = conv;
         }
         return foundConv;
     }
-
 }

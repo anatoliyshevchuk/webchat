@@ -12,5 +12,6 @@ public interface ConversationDao {
     void save(Conversation conversation);
     void delete(Conversation conversation);
     Conversation getConversation(User usr1,User usr2);
-    int checkNewMessages(Conversation conversation);
+    int checkNewMessageCount(Conversation conversation);
+    void updateConversation(Conversation conversation);
 }

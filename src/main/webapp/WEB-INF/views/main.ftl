@@ -14,14 +14,16 @@
     <p>${error!''}</p>
     </form>
 
-    <p>Opened conversations:</p>
+    <#if Conversations??>
+        <p>Opened conversations:</p>
     <#list Conversations as Conversation>
         <#if Conversation.currentUser.id == user.id>
-            <p><a href="/showConversation/${Conversation.partnerUser.name}">Conversation with ${Conversation.partnerUser.name}</a><a href="/deleteConversation/${Conversation.partnerUser.name}">[X]</a></p>
+            <p><a href="/showConversation/${Conversation.partnerUser.name}">(<b>${Conversation.countNewMessages!''}</b>)Conversation with ${Conversation.partnerUser.name}</a><a href="/updateConversation/${Conversation.partnerUser.name}">[X]</a></p>
         <#else>
             <p><a href="/showConversation/${Conversation.currentUser.name}">NEW Conversation with ${Conversation.currentUser.name}</a></p>
         </#if>
     </#list>
+    </#if>
 
 </body>
 </html>

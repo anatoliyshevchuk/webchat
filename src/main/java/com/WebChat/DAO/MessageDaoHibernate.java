@@ -25,17 +25,21 @@ public class MessageDaoHibernate implements MessageDao  {
     }
 
     @Override
-    public void saveMessage(Message msg) {
+    public boolean saveMessage(Message msg) {
         Session session = HibernateUtil.getOrOpenSession();
+        boolean check=false;
         Transaction trx = null;
         try{
             trx = session.beginTransaction();
             session.save(msg);
             trx.commit();
+            check=true;
         }catch(Exception e){
             System.err.println(e);
+            check=false;
             trx.rollback();
         }
+        return check;
     }
 
 }

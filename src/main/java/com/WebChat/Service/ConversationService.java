@@ -19,23 +19,37 @@ public class ConversationService {
         this.conversationDao = conversationDao;
     }
 
+    //TODO:Refactor Conversation saving and get, do something more clearer
     public List<Conversation> getConversationListByUser(User user) {
+
         List<Conversation> list = conversationDao.getConversationsList(user);
 
-        //TODO: Check new messages where I partner User
-        //Delete Conversation duplicate (where Conversation open from me and to me). Leave only conversation opened from My side
+        //Delete Conversation duplicate (where Conversation open from me and to me). Leave only conversation opened from My side and new for me
         List<Conversation> toRemove = new ArrayList<>();
         for (Conversation conv : list)
         {
             if(conv.getCurrentUser().getId().equals(user.getId()))
             {
+                checkNewMessagesCount(conv); //Checking how many new message I receive in my opened conversation
                 for(Conversation conv2 : list)
                 {
                     if(conv2.getPartnerUser().getId().equals(conv.getCurrentUser().getId()) && conv2.getCurrentUser().getId().equals(conv.getPartnerUser().getId()))
                     {
-                        toRemove.add(conv2);
+                        if(conv.getCountNewMessages()==0 || conv.isActive())
+                            toRemove.add(conv2);
                     }
                 }
+            }
+        }
+        list.removeAll(toRemove);
+        toRemove.clear();
+        //Remove not active conversations
+
+        for(Conversation conv : list)
+        {
+            if (!conv.isActive())
+            {
+                toRemove.add(conv);
             }
         }
         list.removeAll(toRemove);
@@ -46,22 +60,37 @@ public class ConversationService {
         return conversationDao.getListMessage(myId, PartnerId);
     }
 
-    public Conversation saveAsConversation(User currentUser,User partnerUser) {
+    public Conversation saveOrUpdateConversation(User currentUser, User partnerUser) {
         Conversation conv = getConversation(currentUser,partnerUser);
         if(conv==null) {
-            conv = new Conversation(currentUser, partnerUser, new Date());
+            conv = new Conversation(currentUser, partnerUser, new Date(), true);
             conversationDao.save(conv);
+        }
+        else {
+            conv.setActive(true);
+            conversationDao.updateConversation(conv);
         }
         return conv;
     }
 
-    public void deleteConversation(User currentUser,User partnerUser) {
-        Conversation conv = getConversation(currentUser,partnerUser);
-        conversationDao.delete(conv);
+    public void updateConversation(Conversation conversation) {
+        Conversation conv = getConversation(conversation.getCurrentUser(),conversation.getPartnerUser());
+        conv.setActive(false);
+        conversationDao.updateConversation(conv);
     }
 
     private Conversation getConversation(User usr1, User usr2) {
         return conversationDao.getConversation(usr1, usr2);
     }
+
+    public void updateConversationDate(Conversation conversation, Date date) {
+        conversation.setLastOpenedByCurrentUser(date);
+        conversationDao.updateConversation(conversation);
+    }
+
+    private void checkNewMessagesCount(Conversation conv) {
+        conv.setCountNewMessages(conversationDao.checkNewMessageCount(conv));
+    }
+
 
 }

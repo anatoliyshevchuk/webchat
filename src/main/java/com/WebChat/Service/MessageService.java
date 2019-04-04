@@ -24,7 +24,6 @@ public class MessageService {
 
     public void sendMessage(String msg, User fromUser, User toUserName) {
         Message message = new Message(msg, new Date(), fromUser, toUserName, true);
-        System.out.println(message);
         messageDAO.saveMessage(message);
     }
 

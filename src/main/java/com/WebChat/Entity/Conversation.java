@@ -27,8 +27,11 @@ public class Conversation  {
     @JoinColumn(name = "PartnerUser")
     User partnerUser;
 
-    @Column(name = "Date")
+    @Column(name = "DateCurrentUserLastCheck")
     Date lastOpenedByCurrentUser;
+
+    @Column(name = "isActive")
+    boolean isActive;
 
     @Transient
     int countNewMessages;
@@ -36,10 +39,11 @@ public class Conversation  {
     public Conversation()
     {}
 
-    public Conversation(User currentUser, User partnerUser, Date date) {
+    public Conversation(User currentUser, User partnerUser, Date date, boolean Active) {
         this.currentUser = currentUser;
         this.partnerUser = partnerUser;
         this.lastOpenedByCurrentUser = date;
+        this.isActive = Active;
     }
 
     public Conversation(User currentUser, User partnerUser) {

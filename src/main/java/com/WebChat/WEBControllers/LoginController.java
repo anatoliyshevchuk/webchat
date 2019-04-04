@@ -48,8 +48,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/logoff")
-    private String logout(HttpServletRequest request)
-    {
+    private String logout(HttpServletRequest request) {
         HttpSession session = request.getSession();
         session.invalidate();
         return "redirect:/";

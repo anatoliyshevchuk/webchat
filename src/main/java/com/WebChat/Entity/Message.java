@@ -32,9 +32,6 @@ public class Message implements Comparable<Message> {
     @Column(name="from_user")
     private int messageFrom;
 
-    @Column
-    private boolean isNew;
-
     public Message()
     {}
 
@@ -43,7 +40,6 @@ public class Message implements Comparable<Message> {
         this.date = date;
         this.messageToUser = messageToUser.getId();
         this.messageFrom = messageFromUser.getId();
-        this.isNew = isNew;
     }
 
 
