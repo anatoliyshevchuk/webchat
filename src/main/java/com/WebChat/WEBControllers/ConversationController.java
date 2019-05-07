@@ -20,7 +20,6 @@ import java.util.List;
 @Scope("session")
 public class ConversationController {
 
-    //TODO:Thread safe variables or Scope==session will be enough or maybe use AtomicRef? dunno yet
     private final UserService userService;
     private final MessageService messageService;
     private final ConversationService conversationService;
@@ -36,7 +35,6 @@ public class ConversationController {
     private ModelAndView startConversation(@RequestParam ("conversationPartner") String name, ModelAndView modelAndView, @SessionAttribute("user") User thisUser, @SessionAttribute("Conversations") List<Conversation> conversationList) {
 
         User conversationPartner = userService.getUserByUserName(name);
-
         modelAndView.setViewName("main");
         if(conversationPartner==null) {
             modelAndView.addObject("error","No such user found");
@@ -56,15 +54,28 @@ public class ConversationController {
 
     @RequestMapping(value="/sendMessage", method= RequestMethod.POST)
     private String sendMessage(@RequestParam("message")String message, @SessionAttribute("user") User thisUser,@RequestParam("sendto") String name, @SessionAttribute("Conversations") List<Conversation> conversationList) {
-        //TODO:Refactor to conversations
-        User conversationPartner = seekConversationInSession(name,conversationList).getPartnerUser();
-        messageService.sendMessage(message,thisUser,conversationPartner);
-        return "redirect:/showConversation/"+conversationPartner.getName();
+
+        //check if conversation with partner user exist in user session
+        Conversation conversation=seekConversationInSession(name,conversationList);
+        if (conversation==null) {
+            conversation = conversationService.saveOrUpdateConversation(thisUser,userService.getUserByUserName(name));
+        }
+        messageService.sendMessage(message,thisUser,conversation.getPartnerUser());
+        return "redirect:/showConversation/"+conversation.getPartnerUser().getName();
     }
 
 
     @RequestMapping(value = "/showConversation/{name}",method = RequestMethod.GET)
     private ModelAndView conversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> conversationList) {
+
+        //check if partner user exist. If not - redirect to main menu
+        if (!userService.checkUserName(name))
+        {
+            modelAndView.setViewName("redirect:/menu");
+            return modelAndView;
+        }
+
+        //check if current user have opened conversation with choosen partner
         Conversation conversation = seekConversationInSession(name,conversationList);
         User conversationPartner;
         if(conversation==null)
@@ -76,6 +87,8 @@ public class ConversationController {
             conversationService.updateConversationDate(conversation, new Date());
             conversationPartner=conversation.getPartnerUser();
         }
+
+        //get message list
         List<Message> messageList = conversationService.getListMessage(thisUser.getId(), conversationPartner.getId());
 
         //TODO:change sort to Set with compare by dates?
@@ -91,6 +104,7 @@ public class ConversationController {
     @RequestMapping(value = "/updateConversation/{name}",method = RequestMethod.GET)
     private ModelAndView updateConversation(@SessionAttribute("user") User thisUser, ModelAndView modelAndView, @PathVariable("name") String name, @SessionAttribute("Conversations") List<Conversation> conversationList)
     {
+        //if user click [X]: update conversation (set to InActive state)
         Conversation convToDelete=seekConversationInSession(name,conversationList);
         conversationService.updateConversation(convToDelete);
         conversationList.remove(convToDelete);
@@ -100,12 +114,14 @@ public class ConversationController {
     }
 
     private Conversation seekConversationInSession(String name, List<Conversation> conversationList) {
+        //store opened conversations in session
         Conversation foundConv=null;
         for (Conversation conv : conversationList)
         {
             if(conv.getPartnerUser().getName().equals(name))
                 foundConv = conv;
         }
+
         return foundConv;
     }
 }

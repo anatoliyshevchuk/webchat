@@ -26,4 +26,22 @@ public class UserService {
         //TODO: Spring Security
         return usr.getName().equals(name) & usr.getPassword().equals(password);
     }
+
+    public void saveUser(String name, String password, String email)
+    {
+        User newUser = new User();
+        newUser.setName(name);
+        newUser.setPassword(password);
+        newUser.setEmail(email);
+
+        userDao.saveUser(newUser);
+    }
+
+    public boolean checkUserName(String name){
+        User usr;
+        usr = userDao.getUserByName(name);
+        if(usr==null)
+            return false;
+        return true;
+    }
 }

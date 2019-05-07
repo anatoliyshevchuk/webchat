@@ -54,4 +54,8 @@ public class LoginController {
         return "redirect:/";
     }
 
+    @RequestMapping(value = "/registration")
+    private String registration(){
+        return "registration";
+    }
 }

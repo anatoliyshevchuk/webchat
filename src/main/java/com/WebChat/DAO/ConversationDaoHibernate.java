@@ -4,7 +4,7 @@ import com.WebChat.Entity.Conversation;
 import com.WebChat.Entity.Message;
 import com.WebChat.Entity.User;
 import com.WebChat.utils.HibernateUtil;
-import lombok.Builder;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +14,9 @@ import java.util.List;
 
 //TODO: Enable Hibernate 2 level cache, query cache. Check performance
 @Repository
-public class ConversationDaoHibernate implements ConversationDao {
+class ConversationDaoHibernate implements ConversationDao {
+
+    static final Logger logger = Logger.getLogger(ConversationDaoHibernate.class);
 
     @Override
     //TODO: Refactor to new Conversation Class
@@ -37,6 +39,7 @@ public class ConversationDaoHibernate implements ConversationDao {
             messages.addAll(query.getResultList());
             session.getTransaction().commit();
         }catch (Exception e) {
+            logger.error(e);
             session.getTransaction().rollback();
         }
         return messages;
@@ -55,7 +58,7 @@ public class ConversationDaoHibernate implements ConversationDao {
             conversationList = query.getResultList();
             session.getTransaction().commit();
         }catch(Exception e) {
-            System.err.println(e);
+            logger.error(e);
             session.getTransaction().rollback();
         }
         return conversationList;
@@ -69,7 +72,7 @@ public class ConversationDaoHibernate implements ConversationDao {
             session.save(conversation);
             session.getTransaction().commit();
         }catch(Exception e){
-            System.err.println(e);
+            logger.error(e);
             session.getTransaction().rollback();
         }
     }
@@ -82,7 +85,7 @@ public class ConversationDaoHibernate implements ConversationDao {
             session.delete(conversation);
             session.getTransaction().commit();
         }catch(Exception e){
-            System.err.println(e);
+            logger.error(e);
             session.getTransaction().rollback();
         }
     }
@@ -97,10 +100,9 @@ public class ConversationDaoHibernate implements ConversationDao {
             query.setParameter("currentUser", usr1);
             query.setParameter("partnerUser", usr2);
             conv = (Conversation) query.getSingleResult();
-            System.out.println("CONVERSATION FOUNDED:"+conv);
             session.getTransaction().commit();
         }catch(Exception e){
-            System.err.println(e);
+            logger.error(e);
             session.getTransaction().rollback();
         }
         return conv;
@@ -121,7 +123,7 @@ public class ConversationDaoHibernate implements ConversationDao {
             count=query.getResultList().size();
             session.getTransaction().commit();
         }catch(Exception e){
-            System.err.println(e);
+            logger.error(e);
             session.getTransaction().rollback();
         }
         return count;
@@ -135,7 +137,7 @@ public class ConversationDaoHibernate implements ConversationDao {
             session.update(conversation);
             session.getTransaction().commit();
         }catch(Exception e){
-            System.err.println(e);
+            logger.error(e);
             session.getTransaction().rollback();
         }
     }

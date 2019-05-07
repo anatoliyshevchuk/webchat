@@ -4,6 +4,7 @@ import com.WebChat.Entity.Message;
 
 import com.WebChat.Entity.User;
 import com.WebChat.utils.HibernateUtil;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
@@ -12,7 +13,9 @@ import javax.persistence.Query;
 import java.util.List;
 
 @Repository
-public class MessageDaoHibernate implements MessageDao  {
+class MessageDaoHibernate implements MessageDao  {
+
+    static final Logger logger = Logger.getLogger(MessageDaoHibernate.class);
 
     @Override
     public Message getMessageById(Long id) {
@@ -35,9 +38,9 @@ public class MessageDaoHibernate implements MessageDao  {
             trx.commit();
             check=true;
         }catch(Exception e){
-            System.err.println(e);
             check=false;
             trx.rollback();
+            logger.error(e);
         }
         return check;
     }

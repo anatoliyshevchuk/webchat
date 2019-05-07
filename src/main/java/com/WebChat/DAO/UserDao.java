@@ -9,5 +9,5 @@ public interface UserDao {
 
     User getUserById(Long id);
     User getUserByName(String name);
-    void saveUser();
+    void saveUser(User user);
 }

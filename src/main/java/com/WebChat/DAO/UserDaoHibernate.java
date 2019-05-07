@@ -2,7 +2,9 @@ package com.WebChat.DAO;
 
 import com.WebChat.Entity.User;
 import com.WebChat.utils.HibernateUtil;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,7 +12,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 @Repository
-public class UserDaoHibernate implements UserDao {
+class UserDaoHibernate implements UserDao {
+
+    static final Logger logger = Logger.getLogger(MessageDaoHibernate.class);
 
     @Override
     public User getUserById(Long id) {
@@ -28,13 +32,24 @@ public class UserDaoHibernate implements UserDao {
         query.setParameter("loginname",loginname);
         usr = (User)query.getSingleResult();
         }catch(NoResultException e) {
-            System.err.println(e);
+            logger.error(e);
+            session.getTransaction().rollback();
         }
         session.getTransaction().commit();
         return usr;
     }
 
     @Override
-    public void saveUser() {
+    public void saveUser(User user) {
+        Session session = HibernateUtil.getOrOpenSession();
+        try{
+            session.beginTransaction();
+            session.save(user);
+            session.getTransaction().commit();
+
+        }catch (Exception e) {
+            logger.error(e);
+            session.getTransaction().rollback();
+        }
     }
 }
