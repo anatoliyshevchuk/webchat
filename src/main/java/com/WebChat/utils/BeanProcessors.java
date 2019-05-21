@@ -10,12 +10,7 @@ public class BeanProcessors implements BeanPostProcessor {
 
     private static final Logger mylogger = Logger.getLogger(BeanProcessors.class);
 
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        mylogger.info("Bean created:  "+beanName+" : "+bean.toString());
-        return bean;
-    }
-
+   
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return bean;
